@@ -4,7 +4,7 @@ from selenium import webdriver
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 from replaypoker import ReplayPoker
-from utils.settings import TARGET_PSW, TARGET_URL, TARGET_USR
+from utils.settings import TARGET_PSW, TARGET_USR
 
 if __name__ == "__main__":
     driver = webdriver.Remote(
@@ -23,11 +23,10 @@ if __name__ == "__main__":
 
         for lobby in lobbies:
             if not lobby.is_full:
-                replaypoker.join_lobby(driver, lobby.link)
+                replaypoker.join_lobby(lobby)
                 replaypoker.print_board_status()
                 break
-
-    except Exception as e:
-        print("This has bean failed", e)
+    except Exception as error:
+        print(error)
     finally:
         driver.quit()

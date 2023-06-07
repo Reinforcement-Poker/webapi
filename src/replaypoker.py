@@ -1,10 +1,7 @@
 import time
 
-from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 
@@ -39,11 +36,11 @@ class ReplayPoker:
             try:
                 lobby = Lobby(
                     link=element.find_element(By.CSS_SELECTOR, "a").get_attribute("href"),
-                    players=element.find_element(By.CSS_SELECTOR, f"div:nth-child(4)").text,
-                    stakes=element.find_element(By.CSS_SELECTOR, f"div:nth-child(5)").text,
-                    avg_pot=element.find_element(By.CSS_SELECTOR, f"div:nth-child(6)").text,
-                    avg_stake=element.find_element(By.CSS_SELECTOR, f"div:nth-child(7)").text,
-                    time_played=element.find_element(By.CSS_SELECTOR, f"div:nth-child(8)").text,
+                    players=element.find_element(By.CSS_SELECTOR, "div:nth-child(4)").text,
+                    stakes=element.find_element(By.CSS_SELECTOR, "div:nth-child(5)").text,
+                    avg_pot=element.find_element(By.CSS_SELECTOR, "div:nth-child(6)").text,
+                    avg_stake=element.find_element(By.CSS_SELECTOR, "div:nth-child(7)").text,
+                    time_played=element.find_element(By.CSS_SELECTOR, "div:nth-child(8)").text,
                 )
 
                 lobby_list.append(lobby)
@@ -62,15 +59,15 @@ class ReplayPoker:
         button = self.get_button()
         current_bets = self.get_current_bets()
         pot = self.get_pot()
-        actions = self.get_player_actions()
-        actions_text = [action.text.replace("\n", "") for action in actions]
+        # actions = self.get_player_actions()
+        # actions_text = [action.text.replace("\n", "") for action in actions]
 
         print(f"Public cards: {public_cards}")
         print(f"Players info: {players}")
         print(f"Button: {button}")
         print(f"Pot: {pot}")
         print(f"Current bets: {current_bets}")
-        print(f"Current actions: {actions_text}")
+        # print(f"Current actions: {actions_text}")
 
     def get_current_bets(self) -> list[tuple[int, int]]:
         chip_pool = self.driver.find_element(By.CLASS_NAME, "Chips")
@@ -98,7 +95,7 @@ class ReplayPoker:
 
         return [message.text for message in message_history]
 
-    def get_public_cards(history: list[str]) -> list[str]:
+    def get_public_cards(self, history: list[str]) -> list[str]:
         public_cards = []
         for i in reversed(history):
             if "started" in i:
