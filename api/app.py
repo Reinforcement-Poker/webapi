@@ -29,7 +29,7 @@ def fuzzy_predict(state: GameState) -> int:
         state.cost,
     )
 
-    action_index = int(score * len(state.legal_actions) / 100)
+    action_index = int(score * 4 / 100)
 
     if state.cost == 0 and action_index == 0:
         action_index = 1
