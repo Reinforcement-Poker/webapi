@@ -5,12 +5,21 @@ version = "0.0.1"
 requires-python = ">3.10"
 dependencies = [
     "selenium==4.9.1",
-    "python-dotenv==1.0.0"
+    "python-dotenv==1.0.0",
+    "requests==2.31.0",
 ]
 
 [project.optional-dependencies]
 dev = ["pytest", "black", "ruff", "isort", "mypy"]
-api = ["fastapi", "uvicorn", "sckit-fuzzy", "numpy", "matplotblib"]
+api = [
+    "fastapi==0.97.0", 
+    "uvicorn==0.22.0",
+    "SQLAlchemy==2.0.16",
+    "mysql-connector-python==8.0.33",
+    "scikit-fuzzy", 
+    "numpy", 
+    "matplotlib"
+]
 
 [build-system]
 requires = ["hatchling"]
