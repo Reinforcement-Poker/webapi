@@ -17,6 +17,7 @@ api = [
     "SQLAlchemy==2.0.16",
     "mysql-connector-python==8.0.33",
     "scikit-fuzzy", 
+    "treys==0.1.8",
     "numpy", 
     "matplotlib"
 ]
