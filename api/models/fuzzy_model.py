@@ -56,14 +56,14 @@ class FuzzyModel:
         card_number = ["A", "K", "Q", "J", "T", "9", "8", "7", "6", "5", "4", "3", "2"]
 
         max_score = 318
-        card_number = sum(card_number.index(card[1]) ** 2.5 for card in hand)
+        hand_score = sum(card_number.index(card[1]) ** 2.5 for card in hand)
         is_suited = hand[0][0] == hand[1][0]
         is_pair = hand[0][1] == hand[1][1]
 
         if is_pair or is_suited:
-            return 1 - card_number / max_score
+            return 1 - hand_score / max_score
 
-        return 1 - card_number * 1.2 / max_score
+        return 1 - hand_score * 1.2 / max_score
 
     def make_prediction(self, hand_rank: float, pot: float, cost: float) -> float:
         self.action_sim.input["hand_rank"] = hand_rank
