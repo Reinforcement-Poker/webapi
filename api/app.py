@@ -1,10 +1,11 @@
 from fastapi import Depends, FastAPI
 from sqlalchemy.orm import Session
 
+import api.database.queries as query
 from api.database.core import engine, get_db
 from api.database.models import Base, Bet, Game, Player, State
 from api.models.fuzzy_model import FuzzyModel
-from api.schema import GameState
+from api.schema import GameModel, GameState
 
 app = FastAPI()
 fuzzy_model = FuzzyModel()
@@ -33,26 +34,20 @@ def fuzzy_predict(state: GameState) -> int:
     return action_index
 
 
-@app.post("/use_database")
-async def use_database(db: Session = Depends(get_db)) -> bool:
-    player1 = Player(username="John")
-    player2 = Player(username="Emma")
-    player3 = Player(username="Michael")
-    game = Game(n_players=3)
-    db.add_all([player1, player2, player3, game])
+@app.post("/add_game")
+async def add_game(game_info: GameModel, db: Session = Depends(get_db)) -> str:
+    players_name = game_info.players
+    states_info = game_info.states
+
+    new_game = Game(
+        n_players=game_info.n_players,
+        winner=game_info.winner,
+    )
+    db.add(new_game)
     db.commit()
 
-    state1 = State(pot=1000, public_cards="AH KH QH", stage="preflop", game_id=game.id)
-    state2 = State(pot=500, public_cards="2C 3C 4C", stage="turn", game_id=game.id)
-    db.add_all([state1, state2])
-    db.commit()
+    players = [query.get_player(db, name) for name in players_name]
+    states = query.create_all_states(db, states_info, new_game)
+    query.create_all_bets(db, states, players, states_info)
 
-    bet1 = Bet(chips=200, action="fold", player_id=player1.id, state_id=state1.id)
-    bet2 = Bet(chips=200, action="fold", player_id=player2.id, state_id=state1.id)
-    bet3 = Bet(chips=200, action="fold", player_id=player3.id, state_id=state2.id)
-    bet4 = Bet(chips=200, action="fold", player_id=player1.id, state_id=state2.id)
-
-    db.add_all([bet1, bet2, bet3, bet4])
-    db.commit()
-
-    return True
+    return "Game added"
