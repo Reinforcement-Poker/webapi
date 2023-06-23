@@ -1,4 +1,3 @@
-from typing import Any
 from pydantic import BaseModel
 
 
@@ -11,7 +10,7 @@ class GameState(BaseModel):
     button: int = 1
 
 
-class StageModel(BaseModel):
+class StateModel(BaseModel):
     public_cards: list[str]
     player_bets: list[tuple[int, int]]
     pot: int
@@ -21,11 +20,9 @@ class StageModel(BaseModel):
 class GameModel(BaseModel):
     players: list[str]
     winner: int
-    stages: list[StageModel]
+    states: list[StateModel]
+    page: str
 
-    def to_database(self) -> dict[str, Any]:
-        values = self.dict()
-
-        values["n_players"] = len(values)
-
-        return values
+    @property
+    def n_players(self) -> int:
+        return len(self.players)

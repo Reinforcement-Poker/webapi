@@ -28,6 +28,7 @@ class Game(Base):
 
     id: Mapped[int] = MappedColumn(Integer, primary_key=True, nullable=False)
     n_players: Mapped[int] = MappedColumn(Integer, nullable=False)
+    winner: Mapped[int] = MappedColumn(Integer, nullable=False)
     states: Mapped[list["State"]] = relationship(
         "State",
         primaryjoin="foreign(Game.id) == State.game_id",
