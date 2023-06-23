@@ -1,4 +1,5 @@
 import time
+from typing import Any
 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
@@ -53,7 +54,7 @@ class ReplayPoker:
     def join_lobby(self, lobby: Lobby) -> None:
         self.driver.get(lobby.link)
 
-    def scrap_lobby_info(self) -> dict:
+    def scrap_lobby_info(self) -> dict[str, Any]:
         player_actions = self.get_player_actions()
         public_cards, player_cards = self.get_cards()
         current_bets = self.get_current_bets()
@@ -62,10 +63,10 @@ class ReplayPoker:
         player_pos = next(
             player_index for player_index, player in enumerate(player_list) if player[0] == USERNAME
         )
-        player_bet = [bet[1] for bet in current_bets if bet[0] == player_pos]
-        player_bet = player_bet[0] if player_bet else 0
+        filter_player = [bet[1] for bet in current_bets if bet[0] == player_pos]
+        player_bet = filter_player[0] if filter_player else 0
 
-        lobby_info = {}
+        lobby_info: dict[str, Any] = {}
         lobby_info["public_cards"] = public_cards
         lobby_info["player_cards"] = player_cards
         lobby_info["players"] = player_list
