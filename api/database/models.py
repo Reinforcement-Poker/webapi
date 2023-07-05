@@ -40,7 +40,8 @@ class Bet(Base):
     __tablename__ = "bet"
 
     state_id: Mapped[int] = MappedColumn(Integer, primary_key=True, nullable=False)
-    player_id: Mapped[int] = MappedColumn(Integer, primary_key=True, nullable=False)
+    position: Mapped[int] = MappedColumn(Integer, primary_key=True, nullable=False)
+    player_id: Mapped[int] = MappedColumn(Integer, nullable=False)
 
     action: Mapped[str] = MappedColumn(String(30), nullable=False)
     chips: Mapped[int] = MappedColumn(Integer, nullable=False)
