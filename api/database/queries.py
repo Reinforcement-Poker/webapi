@@ -28,11 +28,13 @@ def create_bet(
     db: Session,
     state: State,
     player: Player,
+    position: int,
     chips: int,
     action: str,
 ) -> Bet:
     new_bet = Bet(
         state_id=state.id,
+        position=position,
         player_id=player.id,
         action=action,
         chips=chips,
@@ -44,7 +46,7 @@ def create_bet(
 
 
 def get_player(db: Session, player_name: str) -> Player:
-    player = db.query(Player).filter(Player.id == player_name).first()
+    player = db.query(Player).filter(Player.username == player_name).first()
 
     if player is None:
         player = create_player(db, player_name)
@@ -70,13 +72,88 @@ def create_all_bets(
     players: list[Player],
     states_info: list[StateModel],
 ) -> list[Bet]:
-    bets = [
-        create_bet(db, state, players[player_index], chips, "fold")
-        for state, state_info in zip(states, states_info)
-        for player_index, chips in state_info.player_bets
-    ]
+    player_status = [True] * len(players)
+    board_bets = [0] * len(players)
+    previous_stage = 0
+    last_action = None
+    bets = []
+
+    for state, state_info in zip(states, states_info):
+        player_bets = parse_bets(state_info.player_bets, len(players))
+        order = 0
+
+        if previous_stage != state_info.stage:
+            board_bets = [0] * len(players)
+            last_action = None
+
+        for player_index, chips in player_bets:
+            action = "call"
+
+            if not player_status[player_index]:
+                continue
+
+            if max(*board_bets) < chips:
+                action = "raise"
+
+            if max(board_bets) == board_bets[player_index]:
+                if last_action == "call":
+                    break
+                action = "check"
+
+            if chips == 0 and max(board_bets) > 0:
+                action = "fold"
+                player_status[player_index] = False
+
+            if state_info.stage == 0:
+                if chips == 1:
+                    action = "small_blind"
+                elif chips == 2:
+                    action = "big_blind"
+
+            if action != "fold":
+                board_bets[player_index] = chips
+                last_action = action
+
+            bets.append(
+                create_bet(
+                    db,
+                    state,
+                    players[player_index],
+                    order,
+                    chips,
+                    action,
+                )
+            )
+
+            order += 1
+
+        previous_stage = state_info.stage
 
     db.add_all(bets)
     db.commit()
 
     return bets
+
+
+def parse_bets(
+    player_bets: list[tuple[int, int]],
+    n_players: int,
+) -> list[tuple[int, int]]:
+    if len(player_bets) == 0:
+        return [(index, 0) for index in range(n_players)]
+
+    for index in range(n_players):
+        p_id, _ = player_bets[index]
+        next_index = index + 1
+        next_p_id = (p_id + 1) % n_players
+
+        if next_index < len(player_bets):
+            next_arr_id, _ = player_bets[next_index]
+
+            if next_arr_id != next_p_id:
+                player_bets.insert(next_index, (next_p_id, 0))
+
+        elif len(player_bets) < n_players:
+            player_bets.append((next_p_id, 0))
+
+    return player_bets
