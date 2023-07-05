@@ -35,7 +35,7 @@ def fuzzy_predict(state: GameState) -> int:
 
 
 @app.post("/add_game")
-async def add_game(game_info: GameModel, db: Session = Depends(get_db)) -> str:
+async def add_game(game_info: GameModel, db: Session = Depends(get_db)):
     players_name = game_info.players
     states_info = game_info.states
 
@@ -48,6 +48,9 @@ async def add_game(game_info: GameModel, db: Session = Depends(get_db)) -> str:
 
     players = [query.get_player(db, name) for name in players_name]
     states = query.create_all_states(db, states_info, new_game)
-    query.create_all_bets(db, states, players, states_info)
+    bets = query.create_all_bets(db, states, players, states_info)
 
-    return "Game added"
+    for bet in bets:
+        db.refresh(bet)
+
+    return bets
