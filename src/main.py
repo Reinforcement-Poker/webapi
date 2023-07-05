@@ -9,11 +9,11 @@ from selenium.common.exceptions import (
 )
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
-from replaypoker import ReplayPoker
-from utils.settings import API_URL, TARGET_PSW, TARGET_USR
+from src.replaypoker import ReplayPoker
+from src.utils.settings import API_URL, TARGET_PSW, TARGET_USR
 
 
-def make_prediction(state):
+def make_prediction(state) -> None:
     actions = state.pop("player_actions")
     response = requests.post(API_URL, json=state)
     action_index = response.json()
@@ -25,7 +25,7 @@ def make_prediction(state):
         actions[-1].click()
 
 
-def main(driver):
+def main(driver) -> None:
     replaypoker = ReplayPoker(driver)
     replaypoker.login(TARGET_USR, TARGET_PSW)
     lobbies = replaypoker.get_all_lobbies()

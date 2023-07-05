@@ -6,9 +6,9 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 
-from utils.models import Lobby
-from utils.replaypoker_cards import card_map
-from utils.settings import TARGET_URL, USERNAME
+from src.utils.models import Lobby
+from src.utils.replaypoker_cards import card_map
+from src.utils.settings import TARGET_URL, USERNAME
 
 
 class ReplayPoker:
